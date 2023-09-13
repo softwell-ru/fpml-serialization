@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\AssemblyInfo.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>SoftWell.Fpml.Serialization.Abstractions</AssemblyName>
+    <RootNamespace>SoftWell.Fpml.Serialization</RootNamespace>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\AssemblyInfo.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>SoftWell.Fpml.Confirmation.Serialization.Abstractions</AssemblyName>
+    <RootNamespace>SoftWell.Fpml.Confirmation.Serialization</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SoftWell.Fpml.Confirmation" Version="5.11.0.4"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Abstractions/Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>
