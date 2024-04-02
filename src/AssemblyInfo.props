@@ -1,10 +1,10 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <Import Project="..\Version.props" />
     <PropertyGroup>
+        <LangVersion>latest</LangVersion>
         <Company>SoftWell</Company>
         <Authors>$(Company)</Authors>
         <Owners>$(Company)</Owners>
-        <LangVersion>latest</LangVersion>
         <Copyright>Copyright (c) SoftWell 1996-$([System.DateTime]::Now.ToString(yyyy))</Copyright>
         <RepositoryUrl>https://github.com/softwell-ru/fpml-serialization</RepositoryUrl>
         <Nullable>enable</Nullable>
