@@ -11,7 +11,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         Action<IXmlSerializationOptions<Document>>? configure = null)
     {
-        ArgumentNullException.ThrowIfNull(services);
+        if (services is null) throw new ArgumentNullException(nameof(services));
 
         return services.AddXmlSerialization<Document, IDocumentSerializer, XmlDocumentSerializer>(configure);
     }

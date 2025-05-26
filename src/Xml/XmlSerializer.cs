@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -8,22 +9,20 @@ public class XmlSerializer<TBaseType> : ISerializer<TBaseType>
 {
     private readonly XmlSerializerFactory _xmlSerializerFactory = new();
 
-    private readonly IReadOnlyDictionary<string, Type> _typesMapping;
+    private readonly Dictionary<string, Type> _typesMapping;
 
     private readonly ConcurrentDictionary<Type, XmlSerializer> _serializers = new();
 
     public XmlSerializer(IXmlSerializationOptions<TBaseType> options)
     {
-        ArgumentNullException.ThrowIfNull(options);
+        if (options is null) throw new ArgumentNullException(nameof(options));
 
-        _typesMapping = new Dictionary<string, Type>(
-            EnumerateNamedTypes(options),
-            StringComparer.Ordinal);
+        _typesMapping = GetNamedTypes(options);
     }
 
     public TBaseType Deserialize(Stream stream)
     {
-        ArgumentNullException.ThrowIfNull(stream);
+        if (stream is null) throw new ArgumentNullException(nameof(stream));
 
         string rootNodeName = null!;
 
@@ -47,22 +46,21 @@ public class XmlSerializer<TBaseType> : ISerializer<TBaseType>
         return res;
     }
 
-    public Stream Serialize(TBaseType obj, SerializationOptions options)
+    public void Serialize(Stream stream, TBaseType obj, SerializationOptions options)
     {
-        ArgumentNullException.ThrowIfNull(obj);
-        ArgumentNullException.ThrowIfNull(options);
+        if (stream is null) throw new ArgumentNullException(nameof(stream));
+        if (obj is null) throw new ArgumentNullException(nameof(obj));
+        if (options is null) throw new ArgumentNullException(nameof(options));
 
         var serializer = GetSerializerByType(obj.GetType());
-        var stream = new MemoryStream();
-        var streamWriter = XmlWriter.Create(stream, new()
+        using var streamWriter = XmlWriter.Create(stream, new()
         {
             Encoding = options.Encoding,
             Indent = options.PrettyPrint
         });
 
         serializer.Serialize(streamWriter, obj);
-        stream.Seek(0, SeekOrigin.Begin);
-        return stream;
+        streamWriter.Flush();
     }
 
     private XmlSerializer GetSerializerByName(string name)
@@ -79,22 +77,19 @@ public class XmlSerializer<TBaseType> : ISerializer<TBaseType>
             x => _xmlSerializerFactory.CreateSerializer(type));
     }
 
-    private static IEnumerable<KeyValuePair<string, Type>> EnumerateNamedTypes(IXmlSerializationOptions<TBaseType> options)
+    private static Dictionary<string, Type> GetNamedTypes(IXmlSerializationOptions<TBaseType> options)
     {
-        var types = typeof(TBaseType).Assembly.GetTypes()
+        return typeof(TBaseType).Assembly.GetTypes()
             .Concat(options.KnownAssemblies?.SelectMany(x => x.GetTypes()) ?? Enumerable.Empty<Type>())
             .Concat(options.KnownTypes ?? Enumerable.Empty<Type>())
             .Where(x => x.IsSubclassOf(typeof(TBaseType)))
             .Distinct()
-            .ToList();
-
-        foreach (var t in types)
-        {
-            var attr = t.GetCustomAttributes(typeof(XmlRootAttribute), false).FirstOrDefault();
-            if (attr is XmlRootAttribute xmlRoot)
+            .Select(x => new
             {
-                yield return new KeyValuePair<string, Type>(xmlRoot.ElementName, t);
-            }
-        }
+                Type = x,
+                RootElementName = x.GetCustomAttribute<XmlRootAttribute>(false)?.ElementName
+            })
+            .Where(x => x.RootElementName is not null)
+            .ToDictionary(x => x.RootElementName!, x => x.Type, StringComparer.Ordinal);
     }
 }

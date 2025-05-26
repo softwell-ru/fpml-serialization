@@ -4,5 +4,5 @@ public interface ISerializer<TBaseType>
 {
     TBaseType Deserialize(Stream stream);
 
-    Stream Serialize(TBaseType obj, SerializationOptions options);
+    void Serialize(Stream stream, TBaseType obj, SerializationOptions options);
 }
