@@ -3,17 +3,17 @@
   <Import Project="..\AssemblyInfo.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>SoftWell.Fpml.Serialization.Xml</AssemblyName>
     <RootNamespace>SoftWell.Fpml.Serialization.Xml</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup Condition="('$(TargetFramework)'=='net7.0')">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition="('$(TargetFramework)'=='net8.0')">
+  <ItemGroup>
+    <PackageReference Include="PolySharp" Version="1.15.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1"/>
   </ItemGroup>
 

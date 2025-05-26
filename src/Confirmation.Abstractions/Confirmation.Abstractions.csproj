@@ -3,13 +3,17 @@
   <Import Project="..\AssemblyInfo.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>SoftWell.Fpml.Confirmation.Serialization.Abstractions</AssemblyName>
     <RootNamespace>SoftWell.Fpml.Confirmation.Serialization</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="PolySharp" Version="1.15.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="SoftWell.Fpml.Confirmation" Version="5.11.0.4"/>
   </ItemGroup>
 

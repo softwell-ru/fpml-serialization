@@ -16,9 +16,9 @@ public static class SerializerExtensions
         string str,
         Encoding strEncoding)
     {
-        ArgumentNullException.ThrowIfNull(serializer);
-        ArgumentNullException.ThrowIfNull(str);
-        ArgumentNullException.ThrowIfNull(strEncoding);
+        if (serializer is null) throw new ArgumentNullException(nameof(serializer));
+        if (str is null) throw new ArgumentNullException(nameof(str));
+        if (strEncoding is null) throw new ArgumentNullException(nameof(strEncoding));
 
         using var stream = new MemoryStream(strEncoding.GetBytes(str));
         var res = serializer.Deserialize(stream);
@@ -47,16 +47,20 @@ public static class SerializerExtensions
         SerializationOptions options,
         CancellationToken ct = default)
     {
-        ArgumentNullException.ThrowIfNull(serializer);
-        ArgumentNullException.ThrowIfNull(obj);
-        ArgumentNullException.ThrowIfNull(options);
+        if (serializer is null) throw new ArgumentNullException(nameof(serializer));
+        if (obj is null) throw new ArgumentNullException(nameof(obj));
+        if (options is null) throw new ArgumentNullException(nameof(options));
 
-        using var stream = serializer.Serialize(obj, options);
+        using var stream = new MemoryStream();
+
+        serializer.Serialize(stream, obj, options);
+        stream.Seek(0, SeekOrigin.Begin);
 
         using var reader = new StreamReader(stream, options.Encoding);
 
-        var xml = await reader.ReadToEndAsync(ct);
+        ct.ThrowIfCancellationRequested();
+        var str = await reader.ReadToEndAsync();
 
-        return xml;
+        return str;
     }
 }
