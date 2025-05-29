@@ -13,10 +13,11 @@ public class XmlSerializer<TBaseType> : ISerializer<TBaseType>
 
     private readonly ConcurrentDictionary<Type, XmlSerializer> _serializers = new();
 
+    private readonly IXmlSerializationOptions<TBaseType> _options;
+
     public XmlSerializer(IXmlSerializationOptions<TBaseType> options)
     {
-        if (options is null) throw new ArgumentNullException(nameof(options));
-
+        _options = options ?? throw new ArgumentNullException(nameof(options));
         _typesMapping = GetNamedTypes(options);
     }
 
@@ -53,11 +54,13 @@ public class XmlSerializer<TBaseType> : ISerializer<TBaseType>
         if (options is null) throw new ArgumentNullException(nameof(options));
 
         var serializer = GetSerializerByType(obj.GetType());
-        using var streamWriter = XmlWriter.Create(stream, new()
-        {
-            Encoding = options.Encoding,
-            Indent = options.PrettyPrint
-        });
+        var settings = new XmlWriterSettings();
+
+        _options.ConfigureXmlWriterSettings?.Invoke(settings);
+        settings.Encoding = options.Encoding;
+        settings.Indent = options.PrettyPrint;
+
+        using var streamWriter = XmlWriter.Create(stream, settings);
 
         serializer.Serialize(streamWriter, obj);
         streamWriter.Flush();
